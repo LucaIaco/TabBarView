@@ -8,7 +8,7 @@ In a nutshell, this component is a `UIViewControllerRepresentable` wrapping the 
   - iOS 15.0 (iPhone and iPad)
   - iOS 17.2 (iPhone and iPad)
  
-The project contains the reusable components that make the underlying mechanism to work. You can find them under the folder `Displayable`, which are `TabBarView.swift`, `TabBarView.Item.swift` and `TabBarView.Utils.swift`. The code is higly commented, I hope will give you a good understanding of all the showcased scenario
+The project contains the reusable components that make the underlying mechanism to work. You can find them under the folder `Component`, which are `TabBarView.swift`, `TabBarView.Item.swift` and `TabBarView.Utils.swift`. The code is higly commented, I hope will give you a good understanding of all the showcased scenario
 
 ### Sample code
 

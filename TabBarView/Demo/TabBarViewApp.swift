@@ -27,7 +27,7 @@ struct HomeView:View {
     /// The set of views which are currently loaded in the `TabBarView` component
     @State private var tabViewItems:[TabBarView.Item] = []
     
-    /// The currently selected tab bat view item
+    /// The currently selected tab bar view item
     @State private var selectedItem:TabBarView.Item?
     
     /// Show/Hide the demo panel view
@@ -47,7 +47,7 @@ struct HomeView:View {
                 Text("Fallback view shown when no items are loaded in the `TabBarView`.\n\n Tap on **Show demo panel** to access the demo panel and add / remove items in the `TabBarView`")
                     .multilineTextAlignment(.center)
                     .padding()
-            }.ignoresSafeArea(.all, edges: /*@START_MENU_TOKEN@*/.bottom/*@END_MENU_TOKEN@*/)
+            }.ignoresSafeArea(.all)
         }
     }
     

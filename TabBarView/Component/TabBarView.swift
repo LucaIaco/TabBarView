@@ -21,6 +21,9 @@ struct TabBarView: UIViewControllerRepresentable {
     /// If `true`, all the `TabBarView.Item.view` which are SwiftUI views, will be wrapped in a `NavigationView` / `NavigaitonStack` before being wrapped in a `UIHostingController` to be plugged into the tab bar controller
     let wrapSwiftUIInNavigation:Bool
     
+    /// The tab bar item title for the view "More", where the exceeding items are being displayed into
+    let moreTabTitle:String
+    
     /// A view to be displayed in case `items` is empty
     let fallbackContent: (() -> any View)?
     
@@ -31,9 +34,6 @@ struct TabBarView: UIViewControllerRepresentable {
     /// (5 items for iPhone, 6 for iPad, after which the "More" tab item gets shown)
     private let countLimit = UIDevice.current.userInterfaceIdiom == .pad ? 6 : 5
     
-    /// The tab bar item title for the view "More", where the exceeding items are being displayed into
-    private static let moreTabTitle = "More"
-    
     //MARK: Init
     
     /// Initializes the component
@@ -41,11 +41,13 @@ struct TabBarView: UIViewControllerRepresentable {
     ///   - items: Dataset of the items which are being loaded in the `TabBarView`
     ///   - selection: The currently selected `TabBarView.Item`
     ///   - wrapSwiftUIInNavigation: Default `true`, indicates that all the `TabBarView.Item.view` which are SwiftUI views, will be wrapped in a `NavigationView` / `NavigaitonStack` before being wrapped in a `UIHostingController` to be plugged into the tab bar controller
+    ///   - moreTabTitle: The tab bar item title for the view "More", where the exceeding items are being displayed into. Default is string `More`
     ///   - fallbackContent: Default `nil`, is a view to be displayed in case `items` is empty. Put `nil` if not needed
-    init(items: Binding<[TabBarView.Item]>, selection:Binding<TabBarView.Item?> = .constant(nil), wrapSwiftUIInNavigation:Bool = true, fallbackContent: (() -> any View)? = nil) {
+    init(items: Binding<[TabBarView.Item]>, selection:Binding<TabBarView.Item?> = .constant(nil), wrapSwiftUIInNavigation:Bool = true, moreTabTitle:String = "More", fallbackContent: (() -> any View)? = nil) {
         self._items = items
         self._selection = selection
         self.wrapSwiftUIInNavigation = wrapSwiftUIInNavigation
+        self.moreTabTitle = moreTabTitle
         self.fallbackContent = fallbackContent
     }
     
@@ -104,7 +106,7 @@ struct TabBarView: UIViewControllerRepresentable {
         // More items dataset handling, including Hiding/Showing/Reusing the "More" tab item
         self.datasetHolder.moreItems = moreDataset
         if !self.datasetHolder.moreItems.isEmpty {
-            newPlainVCs.append(oldPlainVCs.first(where: { $0.tabBarItem.title == TabBarView.moreTabTitle }) ?? self.moreViewController)
+            newPlainVCs.append(oldPlainVCs.first(where: { $0.tabBarItem.title == self.moreTabTitle }) ?? self.moreViewController)
         }
         
         // Finalize the resulting item dataset to be rendered later in the tab bar controller
@@ -148,7 +150,7 @@ struct TabBarView: UIViewControllerRepresentable {
         guard let curSelectedItemTitle = selectedViewController?.tabBarItem.title else { selection = nil; return }
         guard curSelectedItemTitle != selection?.title else { return }
         // If the selected tab is the More tab, then there's no valid selection item, and we reset it to nil
-        guard curSelectedItemTitle != TabBarView.moreTabTitle else { selection = nil; return }
+        guard curSelectedItemTitle != self.moreTabTitle else { selection = nil; return }
         selection = self.items.first(where: { $0.title == curSelectedItemTitle })
     }
     
@@ -196,8 +198,8 @@ fileprivate extension TabBarView {
     
     /// Convenience getter that builds and returns a new view controller instance for "More" tab bar item
     private var moreViewController: UIViewController {
-        let vc = UIHostingController(rootView: MoreView(datasetHolder: self.datasetHolder))
-        vc.tabBarItem.title = TabBarView.moreTabTitle
+        let vc = UIHostingController(rootView: MoreView(datasetHolder: self.datasetHolder, moreTabTitle: self.moreTabTitle))
+        vc.tabBarItem.title = self.moreTabTitle
         vc.tabBarItem.image = UIImage(systemName: "ellipsis")
         return vc
     }
@@ -209,6 +211,8 @@ fileprivate extension TabBarView {
     struct MoreView:View {
         
         let datasetHolder: TabBarView.DatasetsHolder
+        let moreTabTitle:String
+        
         @State private var items:[TabBarView.Item] = []
         
         var body: some View {
@@ -220,7 +224,7 @@ fileprivate extension TabBarView {
                 }
             }
             .listStyle(.plain)
-            .navigationTitle(TabBarView.moreTabTitle)
+            .navigationTitle(self.moreTabTitle)
             .navigationBarTitleDisplayMode(.inline)
             .wrappedInNavigation
             .onReceive(datasetHolder.moreItemsPublisher.receive(on: DispatchQueue.main), perform: { newItems in items = newItems })

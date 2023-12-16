@@ -40,11 +40,15 @@ struct HomeView:View {
 }
 ```
 
-Shortest usage is
+Alternative usages:
 
 ```swift
 ...
+// Short init
 TabBarView(items: $tabViewItems)
+...
+// Full init
+TabBarView(items:, selection: , wrapSwiftUIInNavigation: , moreTabTitle: , fallbackContent: )
 ...
 ```
 

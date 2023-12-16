@@ -65,7 +65,7 @@ extension SampleViews {
     /// - Parameter tabItems: the reference tab bar items to check against in order to avoid duplicates
     /// - Returns: the resulting system icon name
     private static func generateName(against tabItems:[TabBarView.Item]) -> String {
-        let tabItemNames = tabItems.compactMap({ $0.view.tabViewItemTitle })
+        let tabItemNames = tabItems.compactMap({ $0.title })
         guard let newName = Self.sampleNames.first(where: { !tabItemNames.contains($0) }) else {
             return Self.fallbackName
         }

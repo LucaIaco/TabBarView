@@ -15,7 +15,7 @@ struct TabBarView: UIViewControllerRepresentable {
     /// Dataset of the items which are being loaded in the `TabBarView`
     @Binding var items:[TabBarView.Item]
     
-    /// The currently selected `TabBarView.Item`. It can be `nil` if no tab bar item is selected of if the internal "More" tab is selected. Note: setting the wrapped value explicitly to nil will have no effect (so, the component will just sync the value back to the current selected tab item)
+    /// The currently selected `TabBarView.Item`. It can be `nil` if no tab bar item is selected or if the internal "More" tab is selected. Note: setting the wrapped value explicitly to nil will have no effect (so, the component will just sync the value back to the current selected tab item)
     @Binding var selection:TabBarView.Item?
     
     /// If `true`, all the `TabBarView.Item.view` which are SwiftUI views, will be wrapped in a `NavigationView` / `NavigaitonStack` before being wrapped in a `UIHostingController` to be plugged into the tab bar controller
@@ -39,7 +39,7 @@ struct TabBarView: UIViewControllerRepresentable {
     /// Initializes the component
     /// - Parameters:
     ///   - items: Dataset of the items which are being loaded in the `TabBarView`
-    ///   - selection: The currently selected `TabBarView.Item`
+    ///   - selection: The currently selected `TabBarView.Item`. It can be `nil` if no tab bar item is selected or if the internal "More" tab is selected. Note: setting the wrapped value explicitly to nil will have no effect (so, the component will just sync the value back to the current selected tab item)
     ///   - wrapSwiftUIInNavigation: Default `true`, indicates that all the `TabBarView.Item.view` which are SwiftUI views, will be wrapped in a `NavigationView` / `NavigaitonStack` before being wrapped in a `UIHostingController` to be plugged into the tab bar controller
     ///   - moreTabTitle: The tab bar item title for the view "More", where the exceeding items are being displayed into. Default is string `More`
     ///   - fallbackContent: Default `nil`, is a view to be displayed in case `items` is empty. Put `nil` if not needed

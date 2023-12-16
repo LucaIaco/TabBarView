@@ -52,6 +52,10 @@ TabBarView(items:, selection: , wrapSwiftUIInNavigation: , moreTabTitle: , fallb
 ...
 ```
 
+### Demo showcase
+
+https://github.com/LucaIaco/TabBarView/assets/7451313/8554bc1a-b0a2-4a41-8300-16a86d599311
+
 ### TabBarViewItemProtocol
 
 The `TabBarViewItemProtocol` shall be implemented by the `SwiftUI` view or `UIViewController` based object which we want to display in the `TabBarView`. It exposes the following getters:

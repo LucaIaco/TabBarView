@@ -1,5 +1,5 @@
 # TabBarView
-This project provides a **SwiftUI** component as alternative to the native TabView. It can display both SwiftUI and UIViewController based object, and provides support for handling the NaviationView / NavigationStack when the views are exceeding under More tab, for iOS 15 and iOS 16+ 
+This project provides a **SwiftUI** component as alternative to the native Apple `TabView`. It can display both `SwiftUI` and `UIViewController` based object, and provides support for handling the `NaviationView` / `NavigationStack` when the views are exceeding under More tab, for iOS 15 and iOS 16+ 
 
 In a nutshell, this component is a `UIViewControllerRepresentable` wrapping the UIKit `UITabBarController`, and handles the logic to manage both `SwiftUI` and `UIViewController` views
 

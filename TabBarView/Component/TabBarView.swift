@@ -24,11 +24,11 @@ struct TabBarView: UIViewControllerRepresentable {
     /// The tab bar item title for the view "More", where the exceeding items are being displayed into
     private let moreTabTitle:String
     
-    /// A view to be displayed in case `items` is empty
-    private let fallbackContent: (() -> any View)?
-    
     /// Indicicates if tapping on the already selected tab bar item, should trigger the popToRoot if the associated view is a navigation, or if it contains a child view being a navigation. This works for both UIKit and SwiftUI views
     private let popToRootOnSelectedTab:Bool
+    
+    /// A view to be displayed in case `items` is empty
+    private let fallbackContent: (() -> any View)?
     
     /// Instance of the object holding the internal datasets
     @StateObject private var datasetHolder = TabBarView.DatasetsHolder()

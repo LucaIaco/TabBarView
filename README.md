@@ -48,7 +48,7 @@ Alternative usages:
 TabBarView(items: $tabViewItems)
 ...
 // Full init
-TabBarView(items:, selection: , wrapSwiftUIInNavigation: , moreTabTitle: , fallbackContent: )
+TabBarView(items:, selection: , wrapSwiftUIInNavigation: , moreTabTitle: , popToRootOnSelectedTab: , fallbackContent: )
 ...
 ```
 

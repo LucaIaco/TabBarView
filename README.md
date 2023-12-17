@@ -79,7 +79,7 @@ It's very **IMPORTANT** to remember that the `tabViewItemTitle`:
 
 ### TabBarView.Item
 
-This is the single data model unit which is given to the `TabBarView` in order to display is internal view. See the usage below:
+This is the single data model unit which is given to the `TabBarView` in order to display his internal view. See the usage below:
 
 ```swift
 /// My Sample SwiftUI view conforming to `TabBarViewItemProtocol`

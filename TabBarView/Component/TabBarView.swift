@@ -19,13 +19,16 @@ struct TabBarView: UIViewControllerRepresentable {
     @Binding var selection:TabBarView.Item?
     
     /// If `true`, all the `TabBarView.Item.view` which are SwiftUI views, will be wrapped in a `NavigationView` / `NavigaitonStack` before being wrapped in a `UIHostingController` to be plugged into the tab bar controller
-    let wrapSwiftUIInNavigation:Bool
+    private let wrapSwiftUIInNavigation:Bool
     
     /// The tab bar item title for the view "More", where the exceeding items are being displayed into
-    let moreTabTitle:String
+    private let moreTabTitle:String
     
     /// A view to be displayed in case `items` is empty
-    let fallbackContent: (() -> any View)?
+    private let fallbackContent: (() -> any View)?
+    
+    /// Indicicates if tapping on the already selected tab bar item, should trigger the popToRoot if the associated view is a navigation, or if it contains a child view being a navigation. This works for both UIKit and SwiftUI views
+    private let popToRootOnSelectedTab:Bool
     
     /// Instance of the object holding the internal datasets
     @StateObject private var datasetHolder = TabBarView.DatasetsHolder()
@@ -42,12 +45,14 @@ struct TabBarView: UIViewControllerRepresentable {
     ///   - selection: The currently selected `TabBarView.Item`. It can be `nil` if no tab bar item is selected or if the internal "More" tab is selected. Note: setting the wrapped value explicitly to nil will have no effect (so, the component will just sync the value back to the current selected tab item)
     ///   - wrapSwiftUIInNavigation: Default `true`, indicates that all the `TabBarView.Item.view` which are SwiftUI views, will be wrapped in a `NavigationView` / `NavigaitonStack` before being wrapped in a `UIHostingController` to be plugged into the tab bar controller
     ///   - moreTabTitle: The tab bar item title for the view "More", where the exceeding items are being displayed into. Default is string `More`
+    ///   - popToRootOnSelectedTab: Indicicates if tapping on the already selected tab bar item, should trigger the popToRoot if the associated view is a navigation, or if it contains a child view being a navigation. This works for both UIKit and SwiftUI views. Default is `true`
     ///   - fallbackContent: Default `nil`, is a view to be displayed in case `items` is empty. Put `nil` if not needed
-    init(items: Binding<[TabBarView.Item]>, selection:Binding<TabBarView.Item?> = .constant(nil), wrapSwiftUIInNavigation:Bool = true, moreTabTitle:String = "More", fallbackContent: (() -> any View)? = nil) {
+    init(items: Binding<[TabBarView.Item]>, selection:Binding<TabBarView.Item?> = .constant(nil), wrapSwiftUIInNavigation:Bool = true, moreTabTitle:String = "More", popToRootOnSelectedTab:Bool = true, fallbackContent: (() -> any View)? = nil) {
         self._items = items
         self._selection = selection
         self.wrapSwiftUIInNavigation = wrapSwiftUIInNavigation
         self.moreTabTitle = moreTabTitle
+        self.popToRootOnSelectedTab = popToRootOnSelectedTab
         self.fallbackContent = fallbackContent
     }
     
@@ -81,7 +86,7 @@ struct TabBarView: UIViewControllerRepresentable {
     }
     
     func makeCoordinator() -> Self.Coordinator { 
-        return .init(tabBarDidSelect: { self.updateSelectionToTabIfNeeded(to: $0) })
+        return .init(popToRootOnSelectedTab: popToRootOnSelectedTab, tabBarDidSelect: { self.updateSelectionToTabIfNeeded(to: $0) })
     }
     
     //MARK: Private
@@ -243,16 +248,35 @@ extension TabBarView {
         /// Closure called when user selects a different view controller in the `UITabBarController`
         let tabBarDidSelect: (UIViewController) -> ()
         
+        /// Indicicates if tapping on the already selected tab bar item, should trigger the popToRoot if the associated view is a navigation, or if it contains a child view being a navigation. This works for both UIKit and SwiftUI views.
+        let popToRootOnSelectedTab:Bool
+        
         //MARK: Initializer
         
         /// Initializes the coordinator delegate object
+        /// - Parameter popToRootOnSelectedTab: Indicicates if tapping on the already selected tab bar item, should trigger the popToRoot if the associated view is a navigation, or if it contains a child view being a navigation. This works for both UIKit and SwiftUI views
         /// - Parameter tabBarDidSelect: Closure called when user selects a different view controller in the `UITabBarController`
-        init(tabBarDidSelect: @escaping (UIViewController) -> Void) { self.tabBarDidSelect = tabBarDidSelect }
+        init(popToRootOnSelectedTab:Bool, tabBarDidSelect: @escaping (UIViewController) -> Void) {
+            self.popToRootOnSelectedTab = popToRootOnSelectedTab
+            self.tabBarDidSelect = tabBarDidSelect
+        }
         
         //MARK: UITabBarControllerDelegate methods
         
         func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
             self.tabBarDidSelect(viewController)
+        }
+        
+        func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+            if self.popToRootOnSelectedTab, tabBarController.selectedViewController == viewController {
+                // Check if the direct view controller associated to the selected tab is a UINavigationController based object or check if it has a child view controller as UINavigationController based object. The latter, will also work for SwiftUI, since turns out that a view with a NavigationView or NavigationStack holds a private view `SwiftUI.UIKitNavigationController` behind it
+                if let nvc = viewController as? UINavigationController {
+                    nvc.popToRootViewController(animated: true)
+                } else if let innerFirstNvc = viewController.children.compactMap({ $0 as? UINavigationController }).first {
+                    innerFirstNvc.popToRootViewController(animated: true)
+                }
+            }
+            return true
         }
     }
 }
